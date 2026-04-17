@@ -13,4 +13,5 @@ router.post('/:groupId/join', auth(userRole.user), joinGroup);
 router.post('/:groupId/leave', auth(userRole.user), leaveGroup);
 router.get('/:groupId/messages', auth(userRole.user), getGroupMessages);
 
-export default router;
+const groupRouter = router;
+export default groupRouter

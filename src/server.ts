@@ -1,9 +1,8 @@
 import mongoose from 'mongoose';
-import app from './app';
+import server from './app';
 import config from './app/config';
 
 const PORT = config.port;
-console.log(config.mongoUri);
 
 const main = async () => {
   try {
@@ -12,15 +11,14 @@ const main = async () => {
     }
 
     const mongo = await mongoose.connect(config.mongoUri);
-    console.log(`✅ MongoDB connected: ${mongo.connection.host}`);
-
-    app.listen(PORT, () => {
-      console.log(`🚀 Server running on http://localhost:${PORT}`);
+    console.log(` MongoDB connected: ${mongo.connection.host}`);
+    server.listen(PORT, () => {
+      console.log(` Server running on http://localhost:${PORT}`);
+      console.log(` Socket.io is ready for real-time communication`);
     });
   } catch (error: any) {
-    console.error('❌ Error starting server:', error.message || error);
+    console.error('Error starting server:', error.message || error);
     process.exit(1);
   }
 };
-
 main();

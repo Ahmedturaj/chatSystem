@@ -1,5 +1,5 @@
 import AppError from "../../error/appError";
-import { Message } from "../message/message.model";
+import Message from "../message/message.model";
 import { IGroup } from "./group.interface";
 import { Group } from "./group.model";
 
