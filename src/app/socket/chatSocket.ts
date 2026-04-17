@@ -1,6 +1,6 @@
 import { Server, Socket } from 'socket.io';
 import jwt from 'jsonwebtoken';
-import config from '../config';           // তোমার config import করো
+import config from '../config';
 import { Group } from '../modules/group/group.model';
 import Message from '../modules/message/message.model';
 

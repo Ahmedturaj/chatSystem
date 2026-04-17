@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
+import dns from 'node:dns';
 import server from './app';
 import config from './app/config';
-
+dns.setServers(['8.8.8.8', '8.8.4.4']);
 const PORT = config.port;
 
 const main = async () => {
