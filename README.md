@@ -1,257 +1,136 @@
-# Boilerplate Web Node.js TypeScript
+# Real-Time Group Chat & Community Platform
 
-A robust and scalable Node.js backend boilerplate built with TypeScript, Express, and MongoDB. This project provides a solid foundation for building web applications with authentication, file uploads, real-time features, and more.
+A full-stack real-time group chat and community system built as part of the interview technical assessment. Users can create/join communities, chat in real-time, see online status, and view message history.
 
-## 🚀 Features
+## ✨ Features
 
-- **TypeScript** - Full TypeScript support for type safety
-- **Express.js** - Fast and minimalist web framework
-- **MongoDB with Mongoose** - Database integration with ODM
-- **JWT Authentication** - Secure token-based authentication
-- **Socket.IO** - Real-time bidirectional communication
-- **File Upload** - Cloudinary integration for file storage
-- **Email Service** - Nodemailer for email notifications
-- **Validation** - Zod for request validation
-- **Error Handling** - Comprehensive error handling system
-- **Environment Configuration** - Secure environment variable management
-- **CORS** - Cross-origin resource sharing enabled
-- **Cookie Parser** - HTTP cookie management
-- **BCrypt** - Password hashing and security
-- **ESLint & Prettier** - Code linting and formatting
+### Core Features
+- User Authentication (Register & Login with JWT)
+- Create, Join, and Leave Groups/Communities
+- Real-time messaging using Socket.io
+- Messages are stored persistently in MongoDB
+- Load previous messages when joining a group
+- Real-time online user status in groups
+- Typing indicators
 
-## 📦 Prerequisites
+### Bonus Implemented
+- Clean and responsive UI
+- Proper error handling
+- Socket authentication with JWT
+- Message timestamps and sender info
 
-- Node.js (v16 or higher)
-- MongoDB (local or cloud instance)
-- npm or yarn
+## 🛠 Tech Stack
 
-## 🛠️ Installation
+### Backend
+- **Node.js** + **Express.js**
+- **TypeScript**
+- **MongoDB** with **Mongoose** ODM
+- **Socket.io** for real-time communication
+- **JWT** for authentication
+- **dotenv** for environment variables
 
-1. **Clone the repository**
-   ```bash
-   git clone <your-repo-url>
-   cd boilerplate-web-nodejs-typescript
-   ```
+### Frontend
+- **React.js** + **TypeScript**
+- **Vite** (build tool)
+- **Tailwind CSS** (for styling)
+- **Socket.io-client**
+- **React Router DOM**
+- **Axios**
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+text## 🔧 Socket.io Room Management
 
-3. **Environment Setup**
-   - Copy `.env.example` to `.env`
-   - Configure all required environment variables:
+Socket.io uses **rooms** to handle group chat efficiently:
 
-   ```env
-   # Server
-   NODE_ENV=development
-   PORT=5000
+- Each group has its own **room** (room name = `groupId`)
+- When a user joins a group → `socket.join(groupId)`
+- Messages are sent only to users in that room using `io.to(groupId).emit()`
+- This ensures messages are delivered only to members of that specific group (very efficient and scalable)
+- Users automatically leave the room when they disconnect or switch groups
 
-   # Database
-   MONGO_URI=mongodb+srv://<username>:<password>@<cluster-url>/<dbname>?retryWrites=true&w=majority
+## 📊 MongoDB Message Indexing (Best Practices)
 
-   # JWT
-   JWT_SECRET=your_jwt_secret
-   JWT_EXPIRE=1h
-   ACCESS_TOKEN_SECRET=your_access_token_secret
-   ACCESS_TOKEN_EXPIRES=7d
-   REFRESH_TOKEN_SECRET=your_refresh_token_secret
-   REFRESH_TOKEN_EXPIRES=90d
+For better performance with large number of messages, add the following indexes:
 
-   # Bcrypt
-   BCRYPT_SALT_ROUNDS=10
+```js
+// In Message model (recommended)
+MessageSchema.index({ group: 1, createdAt: -1 });   // Fast message loading per group
+MessageSchema.index({ sender: 1 });
+These indexes help in quickly fetching the latest messages of a group and improve query performance.
 
-   # Cloudinary (for file uploads)
-   CLOUDINARY_CLOUD_NAME=your_cloud_name
-   CLOUDINARY_API_KEY=your_cloudinary_api_key
-   CLOUDINARY_API_SECRET=your_cloudinary_api_secret
+Installation & Setup
+1. Backend Setup
+Bash# 1. Clone the repository
+git clone <your-repo-url>
+cd backend
 
-   # Email (Nodemailer)
-   EMAIL_EXPIRES=900000
-   EMAIL_HOST=smtp.gmail.com
-   EMAIL_PORT=587
-   EMAIL_ADDRESS=your_email@gmail.com
-   EMAIL_PASS=your_app_password
-   EMAIL_FROM=your_email@gmail.com
-   EMAIL_TO=""
-   ADMIN_EMAIL=admin@example.com
+# 2. Install dependencies
+npm install
 
-   # Frontend
-   FRONTEND_URL=http://localhost:3000
-   ```
+# 3. Create .env file in backend folder
+cp .env.example .env
+Important: MongoDB DNS Fix (Common in Bangladesh)
+If you face this error:
+textquerySrv ECONNREFUSED _mongodb._tcp.xxxxx.mongodb.net
+Add these two lines at the very top of src/server.ts (before any other imports):
+TypeScriptimport dns from 'node:dns';
+dns.setServers(['8.8.8.8', '8.8.4.4']);   // Google's Public DNS
+This fixes DNS resolution issues with MongoDB Atlas SRV records.
+4. Environment Variables (.env)
+envPORT=5000
+MONGO_URI=mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/chatapp
+JWT_SECRET=your_very_strong_jwt_secret_key_here
+NODE_ENV=development
+Make sure your MongoDB Atlas IP whitelist allows 0.0.0.0/0 (for development) or add your current IP.
+5. Run Backend
+Bashnpm run dev
+Server should start on http://localhost:5000
 
-## 🚀 Running the Application
+2. Frontend Setup
+Bash# Open new terminal
+cd frontend
 
-### Development Mode
-```bash
+# Install dependencies
+npm install
+
+# Run frontend
 npm run dev
-```
-Runs the server with hot-reload using `ts-node-dev`.
+Frontend will run on http://localhost:5173
+📋 How to Use
 
-### Production Build
-```bash
-npm run build
-npm start:prod
-```
-Compiles TypeScript to JavaScript and runs the production server.
+Register a new account or Login
+Go to dashboard
+Create a new group or join existing groups
+Click on any group to enter chat
+Start sending real-time messages
+Typing indicators and online status will work automatically
 
-### Other Scripts
-```bash
-npm run lint          # Run ESLint
-npm run lint:fix      # Fix linting issues
-npm run prettier      # Format code with Prettier
-npm run prettier:fix  # Fix formatting issues
-```
+🐞 Troubleshooting
+MongoDB Connection Error (querySrv ECONNREFUSED)
 
-## 📁 Project Structure
+Add dns.setServers(['8.8.8.8', '8.8.4.4']) at the top of server.ts
+Check your internet connection
+Try Cloudflare DNS instead: ['1.1.1.1', '1.0.0.1']
 
-```
-src/
-├── app/
-│   ├── config/          # Environment configuration
-│   ├── error/           # Error handling utilities
-│   ├── middlewares/     # Custom middleware
-│   └── routes/          # Route definitions
-├── modules/
-│   ├── auth/            # Authentication module
-│   └── user/            # User management module
-├── helper/              # Utility functions
-├── utils/               # Additional utilities
-├── server.ts           # Server entry point
-└── app.ts              # Express app configuration
-```
+Socket not connecting
 
-## 🔌 API Endpoints
+Make sure backend is running
+Check that frontend socket URL points to correct backend port
 
-### Authentication Routes (`/api/v1/auth`)
-- `POST /register` - User registration with email verification
-- `POST /verify-email` - Verify email with OTP
-- `POST /login` - User login
-- `POST /refresh-token` - Refresh access token
-- `POST /forgot-password` - Request password reset OTP
-- `POST /reset-password` - Reset password with OTP
-- `POST /logout` - User logout
+CORS Issues
 
-### User Routes (`/api/v1/user`)
-- `POST /create-user` - Create new user (admin only)
-- `GET /get-all-user` - Get all users
-- `GET /get-user/:id` - Get user by ID
-- `PUT /update-user/:id` - Update user information
-- `DELETE /delete-user/:id` - Delete user (admin only)
+Backend has CORS enabled with origin * (for development)
 
-## 🛡️ Authentication Flow
+Future Improvements (Optional)
 
-1. **Registration**: User registers → receives OTP via email → verifies email
-2. **Login**: User logs in → receives access and refresh tokens
-3. **Protected Routes**: JWT token required in Authorization header
-4. **Token Refresh**: Use refresh token to get new access token
-5. **Password Reset**: Request OTP → verify OTP → set new password
+Message read receipts
+File/image sharing
+Group admin roles
+Search messages
+Push notifications
 
-## 📧 Email Templates
+📝 Notes
 
-The project includes email templates for:
-- OTP verification (registration and password reset)
-- User creation confirmation
-- Welcome emails
-
-## 🔄 Real-time Features
-
-Socket.IO is integrated for real-time functionality:
-- Chat messaging
-- Real-time notifications
-- Live updates
-
-## 🗃️ Database Models
-
-### User Model
-```typescript
-{
-  name: string;
-  email: string;
-  password: string;
-  role: 'admin' | 'user';
-  profileImage?: string;
-  otp?: string;
-  otpExpiry?: Date;
-  verified?: boolean;
-}
-```
-
-## 🚨 Error Handling
-
-The application includes comprehensive error handling for:
-- Validation errors (Zod)
-- Database errors (Mongoose)
-- Authentication errors
-- Custom application errors
-
-## 🔧 Configuration
-
-### Environment Variables
-All sensitive configuration is managed through environment variables. See the `.env.example` file for all required variables.
-
-### Cloudinary Setup
-For file uploads, configure your Cloudinary credentials in the environment variables.
-
-### Email Service
-Configure your email service provider (Gmail recommended for development) in the environment variables.
-
-## 🧪 Testing
-
-To add tests to the project:
-
-1. Install testing dependencies:
-   ```bash
-   npm install --save-dev jest @types/jest ts-jest supertest @types/supertest
-   ```
-
-2. Create a `jest.config.js` file
-3. Add test scripts to package.json
-
-## 📦 Deployment
-
-### Build for Production
-```bash
-npm run build
-```
-
-### Start Production Server
-```bash
-npm start:prod
-```
-
-### Docker (Optional)
-Consider adding Docker configuration for containerized deployment.
-
-## 🤝 Contributing
-
-1. Fork the project
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the ISC License.
-
-## 🆘 Support
-
-If you encounter any issues or have questions:
-
-1. Check the console for error messages
-2. Verify all environment variables are set correctly
-3. Ensure MongoDB is running and accessible
-4. Check that all required ports are available
-
-## 🔗 Useful Links
-
-- [Express.js Documentation](https://expressjs.com/)
-- [Mongoose Documentation](https://mongoosejs.com/)
-- [TypeScript Documentation](https://www.typescriptlang.org/)
-- [Socket.IO Documentation](https://socket.io/)
-- [Cloudinary Documentation](https://cloudinary.com/)
-
----
-
-**Happy Coding!** 🎉
+This project was completed within the given 1 night and 1 day timeline.
+Backend reuses the provided authentication boilerplate.
+Frontend built from scratch using Vite + React + TypeScript.
+All requirements mentioned in the task are fulfilled.
