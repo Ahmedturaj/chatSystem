@@ -17,8 +17,8 @@ const moduleRoutes = [
  { 
   path:'/groups',
   route: groupRouter
- }
-
+ },
+ 
 ];
 
 moduleRoutes.forEach((route) => router.use(route.path, route.route));
