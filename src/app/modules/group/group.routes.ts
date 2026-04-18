@@ -6,7 +6,7 @@ import { createGroup, getAllGroups, getGroupMessages, getUserGroups, joinGroup, 
 
 const router = Router();
 
-router.post('/create', auth(userRole.user), createGroup);
+router.post('/', auth(userRole.user), createGroup);
 router.get('/my', auth(userRole.user), getUserGroups);
 router.get('/', auth(userRole.user), getAllGroups);           // discovery
 router.post('/:groupId/join', auth(userRole.user), joinGroup);

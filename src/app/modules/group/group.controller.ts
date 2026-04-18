@@ -65,7 +65,7 @@ export const joinGroup = catchAsync(async (req, res) => {
     if (!user) {
         throw new AppError(400, "user not found");
     };
-    const groupId = req.params.id;
+    const groupId = req.params.groupId;
     if (!groupId) {
         throw new AppError(400, "GroupId is required.");
     };
@@ -89,7 +89,7 @@ export const leaveGroup = catchAsync(async (req, res) => {
     if (!user) {
         throw new AppError(400, "user not found");
     };
-    const groupId = req.params.id;
+    const groupId = req.params.groupId;
     if (!groupId) {
         throw new AppError(400, "GroupId is required.");
     };
@@ -112,11 +112,11 @@ export const getGroupMessages = catchAsync(async (req, res) => {
     if (!user) {
         throw new AppError(400, "user not found");
     };
-    const groupId = req.params.id;
+    const groupId = req.params.groupId;
     if (!groupId) {
         throw new AppError(400, "GroupId is required.");
     };
-    const result = await getGroupMessagesService(userId, groupId);
+    const result = await getGroupMessagesService(groupId, userId);
     if (!result) {
         throw new AppError(400, "Messages Getting request is failed");
     };

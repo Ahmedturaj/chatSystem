@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { userRoutes } from '../modules/user/user.routes';
 import { authRoutes } from '../modules/auth/auth.routes';
+import groupRouter from '../modules/group/group.routes';
 
 const router = Router();
 
@@ -13,6 +14,11 @@ const moduleRoutes = [
     path: '/auth',
     route: authRoutes,
   },
+ { 
+  path:'/groups',
+  route: groupRouter
+ }
+
 ];
 
 moduleRoutes.forEach((route) => router.use(route.path, route.route));
